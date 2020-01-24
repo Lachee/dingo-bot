@@ -32,4 +32,8 @@ Open this configuration up. You will see its a JSON file with a variety of optio
 
 **Redis** is the connection details to the redis
 
+**WkHtmlToImage** is the complete path to the wkthtmltoimage executable.
+- Windows: `D:\wkhtmltox\bin\wkhtmltoimage.exe`
+- Linux: `xvfb-run wkhtmltoimage` (needs to be virtualized) 
+
 Once these are all configured, run the bot again and it should connect just fine.
