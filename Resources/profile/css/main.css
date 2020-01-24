@@ -1,0 +1,32 @@
+* { 
+    font-family: Arial, Helvetica, sans-serif 
+}
+body 
+{
+    overflow: hidden !important;
+    background: transparent;  
+}
+
+h1, h2, h3, h4
+{
+    font-family: 'r6font';
+    font-weight: bold;
+}
+
+.background-orange
+{
+    background: #e56800;
+}
+
+@font-face {
+    font-family: "r6font";
+    src: url("../fonts/r6font.woff") format("woff")
+}
+
+.log {
+    position: absolute;
+    background: black;
+    color: white;
+    z-index: 1000;
+    top: 100px;
+}

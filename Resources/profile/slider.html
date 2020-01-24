@@ -1,0 +1,269 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+	<script src="./js/jquery-3.4.1.min.js"></script>
+	<script src="./js/jquery-ui.min.js"> </script>
+	<script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
+    <script src="./js/jquery-ui-slider-pips.min.js"> </script>
+    <script>
+        const DEFAULT_PROFILE = "eyJVUkwiOiJodHRwczovL3I2LnRyYWNrZXIubmV0d29yay9wcm9maWxlL3BjL09uZG8wOCIsIkF2YXRhciI6Imh0dHBzOi8vdWJpc29mdC1hdmF0YXJzLmFrYW1haXplZC5uZXQvMDI1ODg1YzQtMzdiZS00ZDNhLWFkYzItYWNhYzUxMmE0ZGQ5L2RlZmF1bHRfMjU2XzI1Ni5wbmciLCJSYW5rU1ZHIjoiaHR0cHM6Ly90cmFja2VyY2RuLmNvbS9yYWluYm93Ni11YmkvYXNzZXRzL2ltYWdlcy9zZWFzb241LXJhbmsxNC1oZC5lOGRkYWIxNGVkLnN2ZyIsIkxldmVsIjoyODYsIkJlc3RNTVIiOjMxMDQsIkF2ZXJhZ2VNTVIiOjI5NzksIk1NUiI6Mjc4OSwiUmFua1RleHQiOiJHT0xEIElJSSIsIlRpbWVQbGF5ZWQiOiI0ZCAxOGggMzRtIDQ3cyIsIkRlc2NyaXB0aW9uIjoiSkFDS0FMIiwiUmFuayI6MjYwMCwibmFtZSI6Ik9uZG8wOCIsImxpbmsiOnsidXJsIjoiaHR0cHM6Ly9yNi50cmFja2VyLm5ldHdvcmsvcHJvZmlsZS9wYy9PbmRvMDgiLCJhdmF0YXIiOiJodHRwczovL3ViaXNvZnQtYXZhdGFycy5ha2FtYWl6ZWQubmV0LzAyNTg4NWM0LTM3YmUtNGQzYS1hZGMyLWFjYWM1MTJhNGRkOS9kZWZhdWx0XzI1Nl8yNTYucG5nIiwicmFuayI6Imh0dHBzOi8vdHJhY2tlcmNkbi5jb20vcmFpbmJvdzYtdWJpL2Fzc2V0cy9pbWFnZXMvc2Vhc29uNS1yYW5rMTQtaGQuZThkZGFiMTRlZC5zdmcifSwibWV0YSI6eyJsZXZlbCI6Mjg2LCJiZXN0X21tciI6MzEwNCwiYXZnX3NlYXNvbmFsX21tciI6Mjk3OSwibW1yIjoyNzg5LCJyYW5rIjoiR09MRCBJSUkiLCJ0aW1lX3BsYXllZCI6IjRkIDE4aCAzNG0gNDdzIn0sInRvcF9vcGVyYXRvcnMiOnsiSkFDS0FMIjoiaHR0cHM6Ly90cmFja2VyY2RuLmNvbS9yYWluYm93Ni11YmkvYXNzZXRzL2ltYWdlcy9iYWRnZS1qYWNrYWwuMDMyNmNhMjljYS5wbmciLCJWSUdJTCI6Imh0dHBzOi8vdHJhY2tlcmNkbi5jb20vcmFpbmJvdzYtdWJpL2Fzc2V0cy9pbWFnZXMvYmFkZ2UtdmlnaWwuNGRiNTM4NWIwOC5wbmciLCJBU0giOiJodHRwczovL3RyYWNrZXJjZG4uY29tL3JhaW5ib3c2LXViaS9hc3NldHMvaW1hZ2VzL2JhZGdlLWFzaC4xNjkxM2Q4MmUzLnBuZyJ9LCJnZW5lcmFsIjp7ImtpbGxzLW1hdGNoIjowLjAsImtpbGxzLW1pbiI6MC4wLCJraWxscyI6MTgyNTcsImRlYXRocyI6MTUyOTgsIktEIjoxLjE5MzQyMzk3Njk5MDQ1NjIsImhlYWRzaG90cyI6NzUzNiwid2lucyI6MjkxMiwibG9zc2VzIjoyNTI3LCJNYXRjaGVzIjo1NDM5LCJXaW5QZXJjZW50IjowLjUzNTM5MjUzNTM5MjUzNTQsInRvdGFsX3hwIjo1MDg2MTg3NSwibWVsZWVfa2lsbHMiOjM0MSwiYmxpbmRfa2lsbHMiOjMwLCJ0aW1lX3BsYXllZCI6IjEzMDBoIn0sImNhc3VhbCI6eyJraWxscy1tYXRjaCI6My4xOSwia2lsbHMtbWluIjowLjIzLCJraWxscyI6MTQ5MzgsImRlYXRocyI6MTI1NjUsIktEIjoxLjE4ODg1NzkzODcxODY2MjksImhlYWRzaG90cyI6MCwid2lucyI6MjUxNCwibG9zc2VzIjoyMTcyLCJNYXRjaGVzIjo0Njg2LCJXaW5QZXJjZW50IjowLjUzNjQ5MTY3NzMzNjc0Nzc0LCJ0b3RhbF94cCI6MCwibWVsZWVfa2lsbHMiOjAsImJsaW5kX2tpbGxzIjowLCJ0aW1lX3BsYXllZCI6IjEwODVoIn0sInJhbmtlZCI6eyJraWxscy1tYXRjaCI6NC43Niwia2lsbHMtbWluIjowLjIzLCJraWxscyI6MjIyNSwiZGVhdGhzIjoxODU0LCJLRCI6MS4yMDAxMDc4NzQ4NjUxNTY0LCJoZWFkc2hvdHMiOjAsIndpbnMiOjI0NSwibG9zc2VzIjoyMjIsIk1hdGNoZXMiOjQ2NywiV2luUGVyY2VudCI6MC41MjQ2MjUyNjc2NjU5NTI4NSwidG90YWxfeHAiOjAsIm1lbGVlX2tpbGxzIjowLCJibGluZF9raWxscyI6MCwidGltZV9wbGF5ZWQiOiIxNThoIDhtIDQ0cyJ9fQ";
+    </script>
+	
+	<!--
+	<link rel="stylesheet" type="text/css" href="./js/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="./js/jquery-ui-slider-pips.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/slider.css">
+	-->
+	
+	<link rel="stylesheet" type="text/css" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jqueryui.min.css">
+	<link rel="stylesheet" type="text/css" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jquery-ui-slider-pips.min.css">
+	<link rel="stylesheet" type="text/css" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/app.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/slider.css">
+    <style>
+        body {
+            /*font-family: "Open Sans","Helvetica Neue",Roboto,Arial,sans-serif;*/
+			font-family: 'Roboto', sans-serif;
+			background: white;
+            color: black;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        .profile {
+            width: 540px;
+            height: 450px;
+            background: #434c5b;
+            padding: 20px;
+            color: #dddddd;
+        }
+
+        .profile-header {
+            height: 185px;
+        }
+
+        img.avatar {
+            height: 157px;
+            float: left;
+            position: absolute;
+            border-radius: 115px;
+            left: 0px;
+            top: 0px;
+        }
+
+        img.rank {
+            float: left;
+            height: 70px;
+            position: absolute;
+            top: 100px;
+            left: 111px;
+            z-index: 999;
+        }
+
+        .profile-header .avatar-box {
+            width: 185px;
+            float: left;
+            height: 100%;
+            position: relative;
+        }
+
+        .profile-header .title {
+            float: left;
+            padding-top: 3px;
+            height: 100%;
+            width: 314px;
+        }
+
+        .profile-header .title .name {
+            text-align: right;
+            font-size: 29pt;
+            font-weight: bold;
+        }
+
+        .profile-header .title .desc {
+            text-align: right;
+            font-size: 19pt;
+            margin-top: -10px;
+        }
+
+        .profile-content #flat-slider {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+ 
+        .profile-header #flat-slider {
+            margin-top: 39px;
+        }
+
+        span.ui-slider-handle.ui-state-default.ui-corner-all {
+            width: 14px;
+            height: 14px;
+            top: -17px !important;
+            margin-left: -7px !important;
+        }
+
+        span.ui-slider-handle.ui-state-default.ui-corner-all.current {
+            width: 20px;
+            height: 20px;
+            top: -25px !important;
+            margin-left: -10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="profile">
+    <div class="profile-header">
+        <div class="avatar-box">
+            <img class="avatar" data-profile="profile.Avatar" />
+            <img class="rank"  data-profile="profile.RankSVG" />
+        </div>
+        <div class="title">
+            <div class="name" data-profile="profile.name">KommadantKlink</div>
+            <div class="desc" data-profile="profile.Description">Montagne Main</div>
+            <div id="flat-slider"></div>
+        </div>
+    </div>
+    <div class="profile-content">
+    </div>
+</div>
+
+
+
+
+<div class="stuff" style="display: none">
+    <main>
+        <div id="flat-slider"></div>
+        <div id="flat-slider-vertical-1"></div>
+        <div id="flat-slider-vertical-2"></div>
+        <div id="flat-slider-vertical-3"></div>
+    </main>
+</div>
+
+
+</body>
+<script>
+	//$.extend( $.ui.slider.prototype.options, {  animate: 300 });
+
+
+	//The profile from d.lu.je/siege/profile.php
+	var profile = getProfile();
+	console.log("profile:", profile);
+	
+	//Set all the things
+	setAttributes();
+	setMMRSlider();
+	
+	function setAttributes() {
+		function setattr(prefix, object) {			
+			for(let key in object) {
+				let o = object[key];
+				let t = typeof o;
+				
+				//If we are a correct type, set the values.
+				// Otherwise go a level deeper.
+				if (t == 'number' || t == 'string' || t == 'boolean') {
+					$('[data-profile="' + prefix + key + '"]').text(o);
+					$('img[data-profile="' + prefix + key + '"]').attr('src', o);
+				} else {
+					setattr(prefix + key + ".", o);
+				}
+			}
+		}
+		
+		setattr("profile.", profile);
+	}
+	
+	
+	//Set the slider
+	function setMMRSlider() {
+		var slider = $("#flat-slider");
+		var minMMR = profile.MMR;
+		var currentMMR = profile.AverageMMR;
+		var maxMMR = profile.BestMMR;			
+		var rangeMinMMR = minMMR - (minMMR * 0.1);
+		var rangeMaxMMR = maxMMR + (maxMMR * 0.1);
+	
+		//Add the slider
+		slider
+			.slider({
+				min: rangeMinMMR,
+				max: rangeMaxMMR,
+				range: true,
+				values: [minMMR, maxMMR]
+			}).slider("pips", { first: "pip", last: "pip" });
+
+		//Add the fake pip
+		var left = ((currentMMR - rangeMinMMR) / (rangeMaxMMR - rangeMinMMR)) * 100;
+		var fakePip = $("<span></span>").addClass('ui-slider-handle ui-state-default ui-corner-all current').css('left', left + "%");  
+		slider.prepend(fakePip);
+	}
+	
+	function getProfile() {
+		var profile = getCookie("profile");
+		if (profile == "") profile = DEFAULT_PROFILE;
+		
+		var json = atob(profile);
+		return JSON.parse(json);
+	}
+
+	function getCookie(cname) {
+	  var name = cname + "=";
+	  var decodedCookie = decodeURIComponent(document.cookie);
+	  var ca = decodedCookie.split(';');
+	  for(var i = 0; i <ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+		  c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+		  return c.substring(name.length, c.length);
+		}
+	  }
+	  return "";
+	}
+	
+	function setCookie(cname, cvalue, exdays) {
+	  var d = new Date();
+	  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	  var expires = "expires="+ d.toUTCString();
+	  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+	}
+
+	/*
+$("#flat-slider-vertical-1")
+    .slider({
+        max: 25,
+        min: 0,
+        range: "min",
+        value: 25,
+        orientation: "vertical"
+    });
+
+    $("#flat-slider-vertical-2")
+    .slider({
+        max: 25,
+        min: 0,
+        range: "max",
+        value: 12,
+        orientation: "vertical"
+    });
+
+$("#flat-slider-vertical-3")
+    .slider({
+        max: 25,
+        min: 0,
+        range: "min",
+        value: 0,
+        orientation: "vertical"
+    });
+
+    $("#flat-slider-vertical-1, #flat-slider-vertical-2, #flat-slider-vertical-3")
+    .slider("pips", {
+        first: "pip",
+        last: "pip"
+    })
+    .slider("float");
+	*/
+
+    
+</script>

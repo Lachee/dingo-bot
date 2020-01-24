@@ -1,0 +1,76 @@
+#operators
+{
+    transform-origin: right;
+}
+.operator{
+    color: white;
+    height: 64px;
+    width: 250px;
+    -webkit-clip-path: polygon(0 0, 100% 0%, 75% 100%, 0% 100%);
+    clip-path: polygon(0 0, 100% 0%, 75% 100%, 0% 100%);
+
+
+    position: absolute;
+    top: 0;
+    opacity: 0;
+}
+
+.operator.right
+{
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+    right: -300px;
+    text-align: right;
+}
+
+.operator.left
+{
+    left: -300px;
+}
+
+.operator .icon 
+{
+    width: 64px;
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+.operator.right .icon { float: right; }
+
+.operator .icon img {
+    width: 64px;
+    height: 64px;
+}
+
+.operator .content
+{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+.operator .name
+{
+    font-family: 'r6font';
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+}
+
+.ticker {
+    position: relative;
+    top: -6px;
+}
+
+.operator .stat-name {
+    margin-right: 12px;
+    font-size: 16pt;
+    font-family: 'r6font';
+}
+
+.operator .stat-value 
+{
+    font-family: 'r6font';
+    font-size: 16pt;
+}
