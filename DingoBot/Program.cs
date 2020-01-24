@@ -136,14 +136,14 @@ namespace DingoBot
                 var serializedProfile = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(profile));
                 var encodedProfile = System.Convert.ToBase64String(serializedProfile);
 
-                //Store the profile into the cookie
+                //Store the profile into the cookie. We will write it to a JS for convience.
                 renderer.SetCookie("profile", encodedProfile);
+                await File.WriteAllTextAsync(config.Resources + "profile/default-profile.js", "const DEFAULT_PROFILE=decodeURIComponent(\"" + renderer.GetCookie("profile") + "\");");
 
                 //Prepare the paths
                 Console.WriteLine("Rendering....");
                 string document = Path.Combine(config.Resources, "profile/", "slider.html");
                 string absolute = Path.GetFullPath(document);
-                await File.WriteAllTextAsync(absolute + ".dat", renderer.GetCookie("profile"));
 
                 //Render
                 int exit = await renderer.RenderAsync(absolute, $"{absolute}.png");

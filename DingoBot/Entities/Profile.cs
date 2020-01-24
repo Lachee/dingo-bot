@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using DingoBot.WkHtml;
+using DingoBot.Redis;
+using System.IO;
 
 namespace DingoBot.Entities
 {
@@ -46,6 +48,13 @@ namespace DingoBot.Entities
             [JsonProperty("time_played")]
             public string TimePlayed { get; private set; }
         }
+
+        /// <summary>
+        /// The current instance of the bot.
+        /// TODO: Make this not a singleton.
+        /// </summary>
+        [JsonIgnore]
+        public Dingo Bot => Dingo.Instance;
 
         public string URL => Link.URL;
         public string Avatar => Link.Avatar;
@@ -134,7 +143,70 @@ namespace DingoBot.Entities
             return builder.Build();
         }
 
+        /// <summary>
+        /// Renders a profile image
+        /// </summary>
+        /// <returns></returns>
+        public async Task<byte[]> RenderProfileImageAsync(bool destroyCache = false) {
+            var checksum = GetProfileImageChecksum();
+            var key = Namespace.Combine("profiles", Name, checksum);
+
+            //Fetch the string and return it.
+            if (!destroyCache)
+            {
+                var str = await Bot.Redis.FetchStringAsync(key, null);
+                if (str != null) return Convert.FromBase64String(str);
+            }
+
+            //Generate a new image
+            var renderer = new WkHtmlRenderer(Bot.Configuration.WkHtmlToImage)
+            {
+                Width = 540,
+                Height = 450,
+                Cropping = new WkHtml.WkHtmlRenderer.Crop()
+                {
+                    X = 0,
+                    Y = 0,
+                    Width = 540,
+                    Height = 450,
+                }
+            };
+
+            //Set the cookie
+            string cookie = Encode();
+
+            renderer.SetCookie("profile", cookie);
+            File.WriteAllText("cookie.txt", renderer.GetCookie("profile"));
+
+            //Render
+            string document = Path.GetFullPath(Path.Combine(Bot.Configuration.Resources, "profile/", "slider.html"));
+            byte[] bytes = await renderer.RenderBytesAsync(document);
+
+            //Store the bytes
+            await Bot.Redis.StoreStringAsync(key, Convert.ToBase64String(bytes));
+            await Bot.Redis.SetExpiryAsync(key, TimeSpan.FromMinutes(15));
+
+            //Return the bytes
+            return bytes;
+        }
         
+        /// <summary>
+        /// Encodes the profile into Base64
+        /// </summary>
+        /// <returns></returns>
+        public string Encode()  {
+            var serializedProfile = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(this));
+            return System.Convert.ToBase64String(serializedProfile);
+        }
+
+        protected int GetProfileImageChecksum() {
+            return 241 ^
+                (Avatar.GetHashCode() << 7) ^
+                (Name.GetHashCode() << 7) ^
+                (Rank.GetHashCode() << 7) ^
+                (int)Math.Floor(MMR - ((decimal)MMR % 100));
+        }
+
         public static async Task<Profile> LoadAsync(string accountName)
         {
 
@@ -142,6 +214,8 @@ namespace DingoBot.Entities
             var json = await http.GetStringAsync($"https://d.lu.je/siege/profile.php?username={accountName}");
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Profile>(json);
         }
+
+
     }
 
 

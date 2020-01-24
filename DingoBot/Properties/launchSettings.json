@@ -1,8 +1,7 @@
 {
   "profiles": {
     "DingoBot": {
-      "commandName": "Project",
-      "commandLineArgs": "-debugRenderer"
+      "commandName": "Project"
     }
   }
 }

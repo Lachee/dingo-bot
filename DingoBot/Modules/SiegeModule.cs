@@ -27,8 +27,6 @@ namespace DingoBot.Modules
         public IRedisClient Redis => Bot.Redis;
         public Logger Logger { get; }
 
-        private Random _diceRandom;
-        private int _explosionTally;
 
         public SiegeModule(Dingo bot)
         {
@@ -48,7 +46,11 @@ namespace DingoBot.Modules
                 //Fetch the profile and store it
                 var profile = await Profile.LoadAsync(accountName);
                 await Redis.StoreStringAsync(Namespace.Combine("link", ctx.Member), accountName);
-                await ctx.ReplyAsync(content: "The following profile has been associated with you: ", embed: profile.CreateEmbed());
+
+                //Print out the profile image
+                var image = await profile.RenderProfileImageAsync();
+                using (MemoryStream stream = new MemoryStream(image))
+                    await ctx.RespondWithFileAsync(accountName + ".png", stream, "The following profile has been associated with you: ");
 
                 //Now try and figure out the correct role
                 var settings = await ctx.Guild.GetSettingsAsync();
@@ -103,11 +105,16 @@ namespace DingoBot.Modules
 
             //Fetch the profile
             var profile = await Profile.LoadAsync(accountName);
+            var image = await profile.RenderProfileImageAsync();
+            using (MemoryStream stream = new MemoryStream(image)) 
+                await ctx.RespondWithFileAsync(accountName + ".png", stream);
 
             //Modify the embed and send it
+            /*
             DiscordEmbedBuilder builder = new DiscordEmbedBuilder(profile.CreateEmbed());
             builder.WithFooter($"{member.DisplayName}'s Profile", EmbedExtensions.GetAvatarURL(member));
             await ctx.ReplyAsync(embed: builder.Build());
+            */
         }
 
         [Command("profile")]
@@ -125,23 +132,11 @@ namespace DingoBot.Modules
             
             //Fetch the profile
             var profile = await Profile.LoadAsync(accountName);
-            await ctx.ReplyAsync(embed: profile.CreateEmbed());
+            var image = await profile.RenderProfileImageAsync();
+
+            using (MemoryStream stream = new MemoryStream(image))
+                await ctx.RespondWithFileAsync(accountName + ".png", stream);
         }
 
-        [Command("render"), Aliases("r")]
-        public async Task Render(CommandContext ctx)
-        {
-            await ctx.ReplyWorkingAsync();
-            var response = await (new HttpClient()).GetAsync("https://d.lu.je/siege/mixer/slider.html");
-            var html = await response.Content.ReadAsStringAsync();
-
-            var converter = new NReco.ImageGenerator.HtmlToImageConverter();
-            var bytes = converter.GenerateImage(html, ImageFormat.Png);
-
-            using (var stream = new MemoryStream(bytes)) {
-                await ctx.RespondWithFileAsync("page.png", stream);
-                await ctx.ReplyReactionAsync(true);
-            }
-        }
     }
 }

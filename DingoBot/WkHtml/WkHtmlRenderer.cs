@@ -51,6 +51,10 @@ namespace DingoBot.WkHtml
         /// </summary>
         public string WkHtmlToImagePath { get; }
 
+        /// <summary>
+        /// Is the renderer in debug mode?
+        /// </summary>
+        public bool Debug { get; set; } = false;
 
         /// <summary>
         /// Creates a new WkHtmlRenderer
@@ -123,7 +127,17 @@ namespace DingoBot.WkHtml
             args.Append(" --width ").Append(Width);
             args.Append(" --height ").Append(Height);
             args.Append(" --quality ").Append(Quality);
-            args.Append(" --quiet ");
+
+            if (Debug)
+            {
+                //Debug JS
+                args.Append(" --debug-javascript ");
+            }
+            else
+            {
+                //Silence all output
+                args.Append(" --quiet ");
+            }
 
             //Append the Disable JS
             if (DisableJavaScript)
@@ -148,7 +162,9 @@ namespace DingoBot.WkHtml
             args.Append(" \"").Append(output).Append("\"");
 
             var argstr = args.ToString();
-            Console.WriteLine("Executing: {0}", this.WkHtmlToImagePath + " " + argstr);
+            
+            if (Debug)
+                Console.WriteLine(this.WkHtmlToImagePath + " " + argstr);
 
             //Create the process
             var process = new Process()
