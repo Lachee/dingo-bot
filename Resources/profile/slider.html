@@ -117,6 +117,15 @@
             right: -49px;
             position: absolute;
         }
+
+        .top-operators #attacker, .top-operators #defender {
+            width: 80px;
+            float: left;
+        }
+
+        .top-operators .slider {
+            margin-left: 22px;
+        }
     </style>
 </head>
 <body>
@@ -165,21 +174,42 @@
     setOperatorSliders();
     
     function setOperatorSliders() {
+
+        var topAttacker = "FINKA";
+        var topDefender = "GOYO";
+
+        var topAttackerValue = 0;
+        var topDefenderValue = 0;
+
+        for(var name in profile.Operators) {
+            if (profile.Operators[name].team == "Attackers" && profile.Operators[name].operator_stat > topAttackerValue) {
+                topAttackerValue = profile.Operators[name].operator_stat;
+                topAttacker = name;
+            }
+
+            if (profile.Operators[name].team == "Defenders" && profile.Operators[name].operator_stat > topDefenderValue) {
+                topDefenderValue = profile.Operators[name].operator_stat;
+                topDefender = name;
+            }
+        }
+
         $("#flat-slider-vertical-1")
             .slider({
-                max: 10,
+                max: 100,
                 min: 0,
                 range: "min",
-                value: 5,
+                //value: profile.Operators[topAttacker].KD * 50,
+                value: profile.Operators[topAttacker].WinPercent * 100,
                 orientation: "vertical"
             });
 
         $("#flat-slider-vertical-2")
             .slider({
-                max: 10,
+                max: 100,
                 min: 0,
-                range: "max",
-                value: 5,
+                range: "min",
+                //value: profile.Operators[topDefender].KD * 50,
+                value: profile.Operators[topDefender].WinPercent * 100,
                 orientation: "vertical"
             });
         
@@ -189,6 +219,8 @@
                 last: "pip"
             }).slider('float');
             
+        $('.profile-content #attacker .icon').attr('src', profile.Operators[topAttacker].img);
+        $('.profile-content #defender .icon').attr('src', profile.Operators[topDefender].img);
     }
 	
 	function setAttributes() {
