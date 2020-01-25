@@ -118,6 +118,7 @@ namespace DingoBot
             if (debugRenderer)
             {
                 Console.WriteLine("Debugging Renderer...");
+                /*
                 var renderer = new WkHtml.WkHtmlRenderer(config.WkHtmlToImage)
                 {
                     Width = 540,
@@ -152,7 +153,7 @@ namespace DingoBot
                 } else {
                     Console.WriteLine("Succesfully rendered the image");
                 }
-
+                */
                 Console.WriteLine("Finished Program. End.");
             }
             else

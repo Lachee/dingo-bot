@@ -15,7 +15,6 @@ using System.Linq;
 using DingoBot.CommandNext;
 using System.Net.Http;
 using DingoBot.Entities;
-using NReco.ImageGenerator;
 
 namespace DingoBot.Modules
 {
@@ -40,81 +39,32 @@ namespace DingoBot.Modules
         {
             await ctx.ReplyWorkingAsync();
 
-            //Store the string
-            try
-            {
-                //Fetch the profile and store it
-                var profile = await Profile.LoadAsync(accountName);
-                await Redis.StoreStringAsync(Namespace.Combine("link", ctx.Member), accountName);
+            var profile = await Bot.SiegeManager.LinkProfileAsync(ctx.Member, accountName);
 
-                //Print out the profile image
-                var image = await profile.RenderProfileImageAsync();
-                using (MemoryStream stream = new MemoryStream(image))
-                    await ctx.RespondWithFileAsync(accountName + ".png", stream, "The following profile has been associated with you: ");
-
-                //Now try and figure out the correct role
-                var settings = await ctx.Guild.GetSettingsAsync();
-                var rankedRoleIds = await settings.GetRankRolesAsync();
-
-                //Prepare a list of roles and remove all the ranked roles
-                var rolelist = ctx.Member.Roles.ToList();                
-                foreach(var rrkp in rankedRoleIds)
-                    rolelist.RemoveAll(r => r.Id == rrkp.Value);
-
-                //Find the closest rank
-                Rank previous = Rank.Unranked;
-                foreach (var v in rankedRoleIds.Keys)
-                {
-                    if (profile.MMR >= (uint)v) previous = v;
-                    if (profile.MMR < (uint)v) break;
-                }
-
-                //Add it to our list
-                if (previous != Rank.Unranked)
-                {
-                    var r = ctx.Guild.GetRole(rankedRoleIds[previous]);
-                    rolelist.Add(r);
-                }
-
-                //Apply it
-                await ctx.Member.ReplaceRolesAsync(rolelist);
-
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e);
-                await ctx.ReplyReactionAsync(false);
-            }
+            //Render the profile
+            var render = await profile.GetProfileRenderAsync();
+            await ctx.ReplyWithFileAsync($"{profile.Name}.png", render, "**Profile Linked**");
         }
 
         [Command("profile"), Aliases("p")]
         [Description("Gets the siege profile for the user")]
         public async Task Fetch(CommandContext ctx, DiscordMember member = null)
         {
-            if (member == null)
-                member = ctx.Member;
-
-            //Fetcht he account name
             await ctx.ReplyWorkingAsync();
-            string accountName = await Redis.FetchStringAsync(Namespace.Combine("link", member));
-            if (accountName == null)
+            if (member == null)  member = ctx.Member;
+
+            //Fetch the profile
+            var profile = await Bot.SiegeManager.GetProfileAsync(member);
+            if (profile == null)
             {
-                await ctx.ReplyReactionAsync(false);
+                //Null profile, probably meant the other one
+                await FetchAccount(ctx, member.Username);
                 return;
             }
 
-            //Fetch the profile
-            var profile = await Profile.LoadAsync(accountName);
-            var image = await profile.RenderProfileImageAsync();
-            using (MemoryStream stream = new MemoryStream(image)) 
-                await ctx.RespondWithFileAsync(accountName + ".png", stream);
-
-            //Modify the embed and send it
-            /*
-            DiscordEmbedBuilder builder = new DiscordEmbedBuilder(profile.CreateEmbed());
-            builder.WithFooter($"{member.DisplayName}'s Profile", EmbedExtensions.GetAvatarURL(member));
-            await ctx.ReplyAsync(embed: builder.Build());
-            */
+            //Render the profile
+            var render = await profile.GetProfileRenderAsync();
+            await ctx.ReplyWithFileAsync($"{profile.Name}.png", render);
         }
 
         [Command("profile")]
@@ -129,13 +79,36 @@ namespace DingoBot.Modules
                 await ctx.ReplyReactionAsync(false);
                 return;
             }
-            
-            //Fetch the profile
-            var profile = await Profile.LoadAsync(accountName);
-            var image = await profile.RenderProfileImageAsync();
 
-            using (MemoryStream stream = new MemoryStream(image))
-                await ctx.RespondWithFileAsync(accountName + ".png", stream);
+            //Fetch the account
+            var profile = await Bot.SiegeManager.GetProfileAsync(accountName);
+
+            //Render the profile
+            var render = await profile.GetProfileRenderAsync();
+            await ctx.ReplyWithFileAsync($"{profile.Name}.png", render);
+        }
+
+        [Command("recache")]
+        [Description("Forces a newer version of the profile")]
+        public async Task RecacheAccount(CommandContext ctx, [RemainingText] string accountName)
+        {
+
+            //Fetcht he account name
+            await ctx.ReplyWorkingAsync();
+
+            //Make sure account name is valid
+            if (string.IsNullOrEmpty(accountName))
+            {
+                await ctx.ReplyReactionAsync(false);
+                return;
+            }
+
+            //Fetch the account and force it to update
+            var profile = await Bot.SiegeManager.GetProfileAsync(accountName, true);
+
+            //Render the profile
+            var render = await profile.GetProfileRenderAsync();
+            await ctx.ReplyWithFileAsync($"{profile.Name}.png", render);
         }
 
     }

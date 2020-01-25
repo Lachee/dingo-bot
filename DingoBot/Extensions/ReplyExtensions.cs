@@ -4,6 +4,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,37 @@ namespace DingoBot.Extensions
         {
             return await Dingo.Instance.ReplyManager.ReplyAsync(ctx, content, embed);
         }
+
+        /// <summary>
+        /// Responds to a message with a file.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileData"></param>
+        /// <param name="content"></param>
+        /// <param name="embed"></param>
+        /// <returns></returns>
+        public static async Task<DiscordMessage> ReplyWithFileAsync(this CommandContext ctx, string fileName, Stream fileData, string content = null, DiscordEmbed embed = null)
+        {
+            return await Dingo.Instance.ReplyManager.ReplyWithFileAsync(ctx, fileName, fileData, content, embed);
+        }
+
+
+        /// <summary>
+        /// Responds to a message with a file.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileData"></param>
+        /// <param name="content"></param>
+        /// <param name="embed"></param>
+        /// <returns></returns>
+        public static async Task<DiscordMessage> ReplyWithFileAsync(this CommandContext ctx, string fileName, byte[] fileData, string content = null, DiscordEmbed embed = null)
+        {
+            using (MemoryStream stream = new MemoryStream(fileData))
+                return await ctx.ReplyWithFileAsync(fileName, stream, content, embed);
+        }
+
 
         /// <summary>
         /// Quickly responds to a command message with a reaction

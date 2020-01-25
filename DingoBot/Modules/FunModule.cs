@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Data;
 using System.Linq;
 using DingoBot.CommandNext;
+using System.Net.Http;
 
 namespace DingoBot.Modules
 {
@@ -20,6 +21,7 @@ namespace DingoBot.Modules
     [Description("A bunch of fun commands")]
     public class FunModule : BaseCommandModule
     {
+        private readonly HttpClient http = new HttpClient();
         private readonly Regex DiceRegex = new Regex(@"(?'count'\d{1,2})[dD](?'sides'\d{1,3})", RegexOptions.Compiled);
 
         public Dingo Bot { get; }
@@ -33,6 +35,33 @@ namespace DingoBot.Modules
         {
             this.Bot = bot;
             this.Logger = new Logger("CMD-FUN", bot.Logger);
+        }
+
+        [Command("preview"), Aliases("web")]
+        [Description("Renders a preview of a link")]
+        public async Task PreviewLink(CommandContext ctx, [RemainingText] string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                url = Bot.LastManager.GetLast(ctx.Channel).URL;
+
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentNullException("url", "No valid URL was found");
+
+
+            await ctx.ReplyWorkingAsync();
+            
+            //Get a renderer
+            try
+            {
+                var renderer = new WkHtml.WkHtmlRenderer(Bot.Configuration.WkHtmlToImage) { Debug = false };
+                var bytes = await renderer.RenderBytesAsync(url);
+                await ctx.ReplyWithFileAsync("page.png", bytes, $"**URL** <{url}>");
+            }
+            catch(Exception e)
+            {
+                Logger.LogError(e);
+                await ctx.ReplyReactionAsync(false);
+            }
         }
 
         [Command("roll"), Aliases("r")]

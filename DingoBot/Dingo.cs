@@ -30,6 +30,8 @@ namespace DingoBot
         public DiscordClient Discord { get; }
         public CommandsNextExtension CommandsNext { get; }
         public ReplyManager ReplyManager { get; }
+        public SiegeManager SiegeManager { get; }
+        public LastManager LastManager { get; }
 
         public Dingo(BotConfig config)
         {
@@ -46,6 +48,8 @@ namespace DingoBot
 
             Logger.Log("Creating Instances");
             ReplyManager = new ReplyManager(this, Logger.CreateChild("REPLY"));
+            SiegeManager = new SiegeManager(this, Logger.CreateChild("SIEGE"));
+            LastManager = new LastManager(this, Logger.CreateChild("LAST"));
 
             Logger.Log("Creating Command Next");
             var deps = new ServiceCollection()

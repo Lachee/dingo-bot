@@ -15,6 +15,10 @@ namespace DingoBot.WkHtml
             public int X, Y, Width, Height;
         }
 
+        /// <summary>
+        /// Should the cookies be included in the arguments? if not a temporary file will be made
+        /// </summary>
+        public bool EmbedCookies { get; set; } = true;
 
         /// <summary>
         /// The cropping of the image.
@@ -54,7 +58,7 @@ namespace DingoBot.WkHtml
         /// <summary>
         /// Is the renderer in debug mode?
         /// </summary>
-        public bool Debug { get; set; } = false;
+        public bool Debug { get; set; } = true;
 
         /// <summary>
         /// Creates a new WkHtmlRenderer
@@ -116,77 +120,108 @@ namespace DingoBot.WkHtml
         /// <param name="input"></param>
         /// <param name="output"></param>
         /// <returns></returns>
-        public Task<int> RenderAsync(string input, string output)
+        public async Task<int> RenderAsync(string input, string output)
         {
             //Prepare the token source
             var tokenCompletionSource = new TaskCompletionSource<int>();
 
-            //Prepare the arguments and append the basics
-            var args = new StringBuilder();
-            args.Append(" --format ").Append(Format);
-            args.Append(" --width ").Append(Width);
-            args.Append(" --height ").Append(Height);
-            args.Append(" --quality ").Append(Quality);
-
-            if (Debug)
+            //Create a variable that will store (potentially) our cookies path
+            string tempCookieFile = null;
+            try
             {
-                //Debug JS
-                args.Append(" --debug-javascript ");
-            }
-            else
-            {
-                //Silence all output
-                args.Append(" --quiet ");
-            }
 
-            //Append the Disable JS
-            if (DisableJavaScript)
-                args.Append(" --disable-javascript");
+                //Prepare the arguments and append the basics
+                var args = new StringBuilder();
+                args.Append(" --format ").Append(Format);
+                args.Append(" --width ").Append(Width);
+                args.Append(" --height ").Append(Height);
+                args.Append(" --quality ").Append(Quality);
 
-            //Append the crop
-            if (Cropping.HasValue)
-            {
-                args.Append(" --crop-x ").Append(Cropping.Value.X);
-                args.Append(" --crop-y ").Append(Cropping.Value.Y);
-                args.Append(" --crop-w ").Append(Cropping.Value.Width);
-                args.Append(" --crop-h ").Append(Cropping.Value.Height);
-            }
+                if (Debug)
+                {
+                    //Debug JS
+                    args.Append(" --debug-javascript ");
+                }
+                else
+                {
+                    //Silence all output
+                    args.Append(" --quiet ");
+                }
 
-            //Append all the cookies
-            foreach(var kp in _cookies) {
-                args.Append(" --cookie ").Append(kp.Key).Append(" ").Append(kp.Value);
-            }
+                //Append the Disable JS
+                if (DisableJavaScript)
+                    args.Append(" --disable-javascript");
 
-            //Finally, append the input and output
-            args.Append(" \"").Append(input).Append("\"");
-            args.Append(" \"").Append(output).Append("\"");
+                //Append the crop
+                if (Cropping.HasValue)
+                {
+                    args.Append(" --crop-x ").Append(Cropping.Value.X);
+                    args.Append(" --crop-y ").Append(Cropping.Value.Y);
+                    args.Append(" --crop-w ").Append(Cropping.Value.Width);
+                    args.Append(" --crop-h ").Append(Cropping.Value.Height);
+                }
 
-            var argstr = args.ToString();
-            
-            if (Debug)
-                Console.WriteLine(this.WkHtmlToImagePath + " " + argstr);
+                //Append all the cookies
+                if (EmbedCookies)
+                {
+                    foreach (var kp in _cookies)
+                        args.Append(" --cookie ").Append(kp.Key).Append(" ").Append(kp.Value);
+                }
+                else
+                {
+                    //We are storing cookies in a file, so do that
+                    StringBuilder cookieFileContents = new StringBuilder();
+                    foreach (var kp in _cookies)
+                        cookieFileContents.Append(kp.Key).Append("=").Append(kp.Value).Append(";\n");
 
-            //Create the process
-            var process = new Process()
-            {
-                EnableRaisingEvents = true,
-                StartInfo = {
+                    //Write the cookie file
+                    tempCookieFile = Path.GetTempFileName();
+                    await File.WriteAllTextAsync(tempCookieFile, cookieFileContents.ToString());
+
+                    //Set the args
+                    args.Append(" --cookie-jar \"").Append(tempCookieFile).Append("\"");
+                }
+
+                //Finally, append the input and output
+                args.Append(" \"").Append(input).Append("\"");
+                args.Append(" \"").Append(output).Append("\"");
+
+                var argstr = args.ToString();
+
+                if (Debug)
+                    Console.WriteLine(this.WkHtmlToImagePath + " " + argstr);
+
+                //Create the process
+                var process = new Process()
+                {
+                    EnableRaisingEvents = true,
+                    StartInfo = {
                     FileName = this.WkHtmlToImagePath,
                     Arguments = argstr
                 }
-            };
+                };
 
-            //Listen to when the process exits
-            process.Exited += (sender, ags) =>
+                //Listen to when the process exits
+                process.Exited += (sender, ags) =>
+                {
+                    //Tell the task we are done and dispose the process
+                    tokenCompletionSource.SetResult(process.ExitCode);
+                    process.Dispose();
+                };
+
+                //Start the process and return the token source
+                process.Start();
+
+                //Wait for completion
+                return await tokenCompletionSource.Task;
+            }
+            finally
             {
-                //Tell the task we are done and dispose the process
-                tokenCompletionSource.SetResult(process.ExitCode);
-                process.Dispose();
-            };
+                //Delete the temp cookie
+                if (tempCookieFile != null)
+                    File.Delete(tempCookieFile);
+            }
 
-            //Start the process and return the token source
-            process.Start();
-            return tokenCompletionSource.Task;
         }
 
         #region Cookies

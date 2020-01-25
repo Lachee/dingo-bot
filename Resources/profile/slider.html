@@ -4,7 +4,7 @@
 	<script src="./js/jquery-ui.min.js"> </script>
 	<script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
     <script src="./js/jquery-ui-slider-pips.min.js"> </script>
-    <script src="default-profile.js"></script>
+    <script src="DEFAULT_PROFILE.js"></script>
 	
 	<!--
 	<link rel="stylesheet" type="text/css" href="./js/jquery-ui.min.css">
@@ -33,6 +33,9 @@
             background: #434c5b;
             padding: 20px;
             color: #dddddd;
+
+            background: url('img/pattern.jpg');
+            background-size: cover;
         }
 
         .profile-header {
@@ -107,7 +110,6 @@
         }
 
         .title .ui-slider-handle.current div {
-            background: #434c5b;
             color: white;
             transform: rotate(-45deg);
             -webkit-transform: rotateZ(-45deg);
@@ -122,12 +124,12 @@
 <div class="profile">
     <div class="profile-header">
         <div class="avatar-box">
-            <img class="avatar" data-profile="profile.Avatar" src="https://chickatrice.net/chickatrice.png"/>
-            <img class="rank"  data-profile="profile.RankSVG" src="https://chickatrice.net/chickatrice.png"/>
+            <img class="avatar" data-src="r6.Profile.Avatar" src="https://chickatrice.net/chickatrice.png"/>
+            <img class="rank"  data-src="r6.Profile.RankSVG" src="https://chickatrice.net/chickatrice.png"/>
         </div>
         <div class="title">
-            <div class="name" data-profile="profile.name">KommadantKlink</div>
-            <div class="desc" data-profile="profile.Description">Montagne Main</div>
+            <div class="name" data-src="r6.Name">KommadantKlink</div>
+            <div class="desc" data-src="r6.ProfileDataTTL">Montagne Main</div>
             <div id="flat-slider"></div>
         </div>
     </div>
@@ -155,7 +157,7 @@
 	//$.extend( $.ui.slider.prototype.options, {  animate: 300 });
 	//The profile from d.lu.je/siege/profile.php
 	var profile = getProfile();
-	console.log("profile:", profile);
+	console.log("r6. ", profile);
     
 	//Set all the things
     setMMRSlider();
@@ -172,26 +174,32 @@
 				//If we are a correct type, set the values.
 				// Otherwise go a level deeper.
 				if (t == 'number' || t == 'string' || t == 'boolean') {
-					$('[data-profile="' + prefix + key + '"]').text(o);
-					$('img[data-profile="' + prefix + key + '"]').attr('src', o);
+					$('[data-src="' + prefix + key + '"]').text(o);
+					$('img[data-src="' + prefix + key + '"]').attr('src', o);
+                    //console.log(prefix + key , "=", o);
 				} else {
 					setattr(prefix + key + ".", o);
 				}
             }
 		}
 		
-		setattr("profile.", profile);
+		setattr("r6.", profile);
 	}
 	
 	
 	//Set the slider
 	function setMMRSlider() {
 		var slider = $("#flat-slider");
-		var minMMR = profile.MMR;
-		var currentMMR = profile.AverageMMR;
-		var maxMMR = profile.BestMMR;			
-		var rangeMinMMR = minMMR - (minMMR * 0.1);
-		var rangeMaxMMR = maxMMR + (maxMMR * 0.1);
+		var minMMR = profile.MMRHistory.Minimum;
+		var currentMMR = profile.MMRHistory.Current;
+		var maxMMR = profile.MMRHistory.Maximum;			
+	
+        //Just so it doesn't look like visual turds, I am adveraging it.
+        //if (currentMMR == minMMR) 
+        //    currentMMR = profile.MMRHistory.Average;
+
+    	var rangeMinMMR = profile.MMRHistory.RankBelowMinimum; //minMMR - (minMMR * 0.1);
+		var rangeMaxMMR = profile.MMRHistory.RankAboveMaximum; //maxMMR + (maxMMR * 0.1);
 	
 		//Add the slider
 		slider
@@ -205,7 +213,7 @@
 		//Add the fake pip
 		var left = ((currentMMR - rangeMinMMR) / (rangeMaxMMR - rangeMinMMR)) * 100;
 		var fakePip = $("<span></span>").addClass('ui-slider-handle ui-state-default ui-corner-all current').css('left', left + "%");  
-        fakePip.html("<div data-profile=\"profile.MMR\"></div>");
+        fakePip.html("<div>"+currentMMR+"</div>");
 		slider.prepend(fakePip);
 	}
     

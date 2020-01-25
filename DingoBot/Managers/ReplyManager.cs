@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace DingoBot.Managers
 {
@@ -160,6 +161,47 @@ namespace DingoBot.Managers
             if (response == null)
                 response = await ctx.RespondAsync(content: content, embed: embed);
             
+            //Store the reply
+            await StoreReplyAsync(ctx, response);
+            return response;
+        }
+
+        /// <summary>
+        /// Replies to a command context with a file. This will delete any previous reply.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileData"></param>
+        /// <param name="content"></param>
+        /// <param name="embed"></param>
+        /// <returns></returns>
+        public async Task<DiscordMessage> ReplyWithFileAsync(CommandContext ctx, string fileName, Stream fileData, string content = null, DiscordEmbed embed = null)
+        {            
+            //Prepare the response
+            DiscordMessage response = null;
+
+            //This is a command, so lets make sure we have a response
+            var reply = await GetReplyFromMessageAsync(ctx.Message);
+            if (reply != null && reply.CommandMsg == ctx.Message.Id)
+            {
+                //We are a reaction. We cannot create a new reaction, but we will remove our old one
+                if (reply.ResponseType == Reply.SnowflakeType.Reaction)
+                    await ctx.Message.DeleteOwnReactionAsync(DiscordEmoji.FromName(ctx.Client, reply.ResponseEmote));
+
+                //We were previously a message, so we need to delete that and resend.
+                if (reply.ResponseType == Reply.SnowflakeType.Message)
+                {
+                    //Get the response message and load it into our memory cache
+                    // then modify the contents of the message
+                    var msg = await ctx.Channel.GetMessageAsync(reply.ResponseMsg);
+                    if (msg != null) await msg.DeleteAsync("updated response");
+                }
+            }
+
+            //We do not have a response, so just create a new one
+            if (response == null)
+                response = await ctx.RespondWithFileAsync(fileName, fileData, content: content, embed: embed);
+
             //Store the reply
             await StoreReplyAsync(ctx, response);
             return response;

@@ -9,7 +9,7 @@ namespace DingoBot.Entities
     {
         Unranked        = 0,
 
-        CopperV         = 1100,
+        CopperV         = 0001,
         CopperIV        = 1200,
         CopperIII       = 1300,
         CopperII        = 1400,
@@ -39,7 +39,7 @@ namespace DingoBot.Entities
         Champion        = 5000,
     }
 
-    public static class RankHelper
+    public static class RankUtil
     {
         /// <summary>
         /// Gets the colour of the rank
@@ -89,6 +89,54 @@ namespace DingoBot.Entities
             }
 
             return previous;
+        }
+
+        /// <summary>
+        /// Gets the next rank for the given MMR
+        /// </summary>
+        /// <param name="mmr"></param>
+        /// <returns></returns>
+        public static Rank GetNextRank(uint mmr)
+        {
+            var values = Enum.GetValues(typeof(Rank));
+
+            for(int i = 0; i < values.Length; i++) {
+                int ni = Math.Min(i + 1, values.Length - 1);
+
+                var cur = (Rank) values.GetValue(i);
+                var nex = (Rank) values.GetValue(ni);
+
+                if (mmr >= (uint)cur && mmr < (uint)nex) {
+                    return nex;
+                }
+            }
+
+            return Rank.Champion;
+        }
+
+        /// <summary>
+        /// Gets the prevoius rank for the MMR
+        /// </summary>
+        /// <param name="mmr"></param>
+        /// <returns></returns>
+        public static Rank GetPreviousRank(uint mmr)
+        {
+            var values = Enum.GetValues(typeof(Rank));
+
+            for (int i = 1; i < values.Length; i++)
+            {
+                int ni = Math.Min(i + 1, values.Length - 1);
+
+                var cur = (Rank)values.GetValue(i);
+                var nex = (Rank)values.GetValue(ni);
+
+                if (mmr >= (uint)cur && mmr < (uint)nex)
+                {
+                    return (Rank)values.GetValue(i-1);
+                }
+            }
+
+            return Rank.Champion;
         }
     }
 }

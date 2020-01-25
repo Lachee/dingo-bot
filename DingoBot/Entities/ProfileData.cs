@@ -12,9 +12,8 @@ using System.IO;
 
 namespace DingoBot.Entities
 {
-    public class Profile
+    public class ProfileData : Base64Serializable
     {
-        private static readonly HttpClient http = new HttpClient();
 
         public class Links
         {
@@ -68,7 +67,7 @@ namespace DingoBot.Entities
 
         public string Description => TopOperators.FirstOrDefault().Key;
 
-        public Rank Rank => RankHelper.GetRank(MMR);
+        public Rank Rank => RankUtil.GetRank(MMR);
 
         /// <summary>
         /// The profile name
@@ -113,6 +112,10 @@ namespace DingoBot.Entities
         [JsonProperty("ranked")]
         public ModeStatistics RankedStatistics { get; private set; }
 
+        /// <summary>
+        /// Creates a DiscordEmbed to represent the profile
+        /// </summary>
+        /// <returns></returns>
         public DiscordEmbed CreateEmbed()
         {
             var main = TopOperators.FirstOrDefault();
@@ -142,80 +145,28 @@ namespace DingoBot.Entities
 
             return builder.Build();
         }
-
-        /// <summary>
-        /// Renders a profile image
-        /// </summary>
-        /// <returns></returns>
-        public async Task<byte[]> RenderProfileImageAsync(bool destroyCache = false) {
-            var checksum = GetProfileImageChecksum();
-            var key = Namespace.Combine("profiles", Name, checksum);
-
-            //Fetch the string and return it.
-            if (!destroyCache)
-            {
-                var str = await Bot.Redis.FetchStringAsync(key, null);
-                if (str != null) return Convert.FromBase64String(str);
-            }
-
-            //Generate a new image
-            var renderer = new WkHtmlRenderer(Bot.Configuration.WkHtmlToImage)
-            {
-                Width = 540,
-                Height = 450,
-                Cropping = new WkHtml.WkHtmlRenderer.Crop()
-                {
-                    X = 0,
-                    Y = 0,
-                    Width = 540,
-                    Height = 450,
-                }
-            };
-
-            //Set the cookie
-            string cookie = Encode();
-
-            renderer.SetCookie("profile", cookie);
-            File.WriteAllText("cookie.txt", renderer.GetCookie("profile"));
-
-            //Render
-            string document = Path.GetFullPath(Path.Combine(Bot.Configuration.Resources, "profile/", "slider.html"));
-            byte[] bytes = await renderer.RenderBytesAsync(document);
-
-            //Store the bytes
-            await Bot.Redis.StoreStringAsync(key, Convert.ToBase64String(bytes));
-            await Bot.Redis.SetExpiryAsync(key, TimeSpan.FromMinutes(15));
-
-            //Return the bytes
-            return bytes;
-        }
         
         /// <summary>
-        /// Encodes the profile into Base64
+        /// Decodes the profile from Base64
+        /// </summary>
+        /// <param name="b64"></param>
+        /// <returns></returns>
+        public static ProfileData FromBase64(string b64) {
+            var serializedProfile = Convert.FromBase64String(b64);
+            return JsonConvert.DeserializeObject<ProfileData>(Encoding.UTF8.GetString(serializedProfile));
+        }
+
+        /// <summary>
+        /// Gets a code representing the cache the image would be stored under.
         /// </summary>
         /// <returns></returns>
-        public string Encode()  {
-            var serializedProfile = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(this));
-            return System.Convert.ToBase64String(serializedProfile);
+        public int GetCacheCode() {
+            return 45415
+                ^ (TimePlayed.GetHashCode() << 7)
+                ^ (Avatar.GetHashCode() << 7)
+                ^ (Name.GetHashCode() << 7)
+                ^ (Rank.GetHashCode() << 7);
         }
-
-        protected int GetProfileImageChecksum() {
-            return 241 ^
-                (Avatar.GetHashCode() << 7) ^
-                (Name.GetHashCode() << 7) ^
-                (Rank.GetHashCode() << 7) ^
-                (int)Math.Floor(MMR - ((decimal)MMR % 100));
-        }
-
-        public static async Task<Profile> LoadAsync(string accountName)
-        {
-
-            //Fetch the client
-            var json = await http.GetStringAsync($"https://d.lu.je/siege/profile.php?username={accountName}");
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Profile>(json);
-        }
-
-
     }
 
 
