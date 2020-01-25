@@ -95,21 +95,21 @@
             margin-top: 39px;
         }
 
-        span.ui-slider-handle.ui-state-default.ui-corner-all {
+        .profile-header span.ui-slider-handle.ui-state-default.ui-corner-all {
             width: 14px;
             height: 14px;
             top: -17px !important;
             margin-left: -7px !important;
         }
 
-        span.ui-slider-handle.ui-state-default.ui-corner-all.current {
+        .profile-header span.ui-slider-handle.ui-state-default.ui-corner-all.current {
             width: 20px;
             height: 20px;
             top: -25px !important;
             margin-left: -10px;
         }
 
-        .title .ui-slider-handle.current div {
+        .profile-header .title .ui-slider-handle.current div {
             color: white;
             transform: rotate(-45deg);
             -webkit-transform: rotateZ(-45deg);
@@ -134,20 +134,20 @@
         </div>
     </div>
     <div class="profile-content">
+        <div class="top-operators">
+            <div id="attacker">
+                <div class="slider"><div id="flat-slider-vertical-1"></div></div>
+                <img class="icon" src="https://trackercdn.com/rainbow6-ubi/assets/images/badge-blitz.cd45df08f6.png"/>
+            </div>
+            <div id="defender">
+                <div class="slider"><div id="flat-slider-vertical-2"></div></div>
+                <img class="icon" src="https://trackercdn.com/rainbow6-ubi/assets/images/badge-tachanka.ae7943f00d.png"/>
+            </div>
+        </div>
     </div>
 </div>
 
 
-
-
-<div class="stuff" style="display: none">
-    <main>
-        <div id="flat-slider"></div>
-        <div id="flat-slider-vertical-1"></div>
-        <div id="flat-slider-vertical-2"></div>
-        <div id="flat-slider-vertical-3"></div>
-    </main>
-</div>
 
 
 </body>
@@ -161,8 +161,35 @@
     
 	//Set all the things
     setMMRSlider();
-	setAttributes();
+    setAttributes();
+    setOperatorSliders();
     
+    function setOperatorSliders() {
+        $("#flat-slider-vertical-1")
+            .slider({
+                max: 10,
+                min: 0,
+                range: "min",
+                value: 5,
+                orientation: "vertical"
+            });
+
+        $("#flat-slider-vertical-2")
+            .slider({
+                max: 10,
+                min: 0,
+                range: "max",
+                value: 5,
+                orientation: "vertical"
+            });
+        
+        $("#flat-slider-vertical-1, #flat-slider-vertical-2, #flat-slider-vertical-3")
+            .slider("pips", {
+                first: "pip",
+                last: "pip"
+            }).slider('float');
+            
+    }
 	
 	function setAttributes() {
 		function setattr(prefix, object) {
