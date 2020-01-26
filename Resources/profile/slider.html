@@ -268,13 +268,13 @@
         var topDefenderValue = 0;
 
         for(var name in profile.Operators) {
-            if (profile.Operators[name].team == "Attackers" && profile.Operators[name].operator_stat > topAttackerValue) {
-                topAttackerValue = profile.Operators[name].operator_stat;
+            if (profile.Operators[name].team == "Attackers" && profile.Operators[name].TimePlayed > topAttackerValue) {
+                topAttackerValue = profile.Operators[name].TimePlayed;
                 topAttacker = name;
             }
 
-            if (profile.Operators[name].team == "Defenders" && profile.Operators[name].operator_stat > topDefenderValue) {
-                topDefenderValue = profile.Operators[name].operator_stat;
+            if (profile.Operators[name].team == "Defenders" && profile.Operators[name].TimePlayed > topDefenderValue) {
+                topDefenderValue = profile.Operators[name].TimePlayed;
                 topDefender = name;
             }
         }
