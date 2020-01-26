@@ -80,7 +80,7 @@ namespace DingoBot.Managers
         /// <returns></returns>
         internal WkHtmlRenderer InternalGetWkHtmlRenderer() {
             //Generate a new image
-            return new WkHtmlRenderer(Bot.Configuration.WkHtmlToImage)
+            return new WkHtmlRenderer(Bot.Configuration.WkHtmlToImage, Bot.Configuration.WkHtmlToImageArguments)
             {
                 EmbedCookies = false,
                 Width = 540,

@@ -61,12 +61,18 @@ namespace DingoBot.WkHtml
         public bool Debug { get; set; } = true;
 
         /// <summary>
+        /// Default arguments to append
+        /// </summary>
+        public string DefaultArguments { get; set; } = "";
+
+        /// <summary>
         /// Creates a new WkHtmlRenderer
         /// </summary>
         /// <param name="tooling"></param>
-        public WkHtmlRenderer(string tooling)
+        public WkHtmlRenderer(string tooling, string defaultArguments)
         {
             WkHtmlToImagePath = tooling;
+            DefaultArguments = defaultArguments;
         }
 
         /// <summary>
@@ -131,22 +137,16 @@ namespace DingoBot.WkHtml
             {
 
                 //Prepare the arguments and append the basics
-                var args = new StringBuilder();
+                var args = new StringBuilder(DefaultArguments);
                 args.Append(" --format ").Append(Format);
                 args.Append(" --width ").Append(Width);
                 args.Append(" --height ").Append(Height);
                 args.Append(" --quality ").Append(Quality);
 
+                //Debug JS
                 if (Debug)
-                {
-                    //Debug JS
                     args.Append(" --debug-javascript ");
-                }
-                else
-                {
-                    //Silence all output
-                    args.Append(" --quiet ");
-                }
+                
 
                 //Append the Disable JS
                 if (DisableJavaScript)

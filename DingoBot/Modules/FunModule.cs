@@ -53,7 +53,7 @@ namespace DingoBot.Modules
             //Get a renderer
             try
             {
-                var renderer = new WkHtml.WkHtmlRenderer(Bot.Configuration.WkHtmlToImage) { Debug = false };
+                var renderer = new WkHtml.WkHtmlRenderer(Bot.Configuration.WkHtmlToImage, Bot.Configuration.WkHtmlToImageArguments) { Debug = false };
                 var bytes = await renderer.RenderBytesAsync(url);
                 await ctx.ReplyWithFileAsync("page.png", bytes, $"**URL** <{url}>");
             }

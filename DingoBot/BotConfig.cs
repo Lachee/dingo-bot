@@ -15,17 +15,11 @@ namespace DingoBot
         public string Token { get { return File.ReadAllText(TokenFile); } }
         public string TokenFile { get; set; } = "discord.key";
 
-        public string GoogleKeyFile { get; set; } = "google.key";
-
-        [JsonIgnore]
-        public bool HasGoogleKey => File.Exists(GoogleKeyFile);
-
-        [JsonIgnore]
-        public string GoogleKey => File.ReadAllText(GoogleKeyFile);
-
 
         public string Resources { get; set; } = "Resources/";
+
         public string WkHtmlToImage { get; set; } = @"D:\wkhtmltox\bin\wkhtmltoimage.exe";
+        public string WkHtmlToImageArguments { get; set; } = "--quiet";
 
         public RedisConfig Redis { get; set; } = new RedisConfig();
         public class RedisConfig
