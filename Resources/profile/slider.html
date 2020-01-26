@@ -224,6 +224,25 @@
 	var profile = getProfile();
 	console.log("r6. ", profile);
 
+    //Add the time components to each operator
+    var mostPlayed = "";
+    var mostPlayedTime = 0;
+
+    for(var name in profile.Operators) {         
+        var time = profile.Operators[name].time_played;
+        var joined = time.replace("d", "").replace("h", "").replace("m", "");
+        var timeparts = joined.split(" ");
+        var value = (timeparts[timeparts.length - 1] * 60) + (timeparts[timeparts.length - 2] * 60 * 60);
+        profile.Operators[name].TimePlayed = value;
+
+        if (value > mostPlayedTime) {
+            mostPlayedTime = value;
+            mostPlayed = name;
+        }
+    }
+
+    $('.title .desc').text(mostPlayed + " Main");
+
     //Format the KD
     profile.Formatted = {
         WinPercent: (profile.Profile.general.WinPercent * 100).toFixed(1) + "%",
@@ -260,7 +279,6 @@
             }
         }
 
-        $('.title .desc').text((topAttackerValue > topDefenderValue ? topAttacker : topDefender) + " Main");
 
         $("#flat-slider-vertical-1")
             .slider({

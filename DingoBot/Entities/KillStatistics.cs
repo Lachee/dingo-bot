@@ -40,5 +40,8 @@ namespace DingoBot.Entities
 
         [JsonProperty("time_played")]
         public string TimePlayed { get; private set; }
+
+        //TODO: Dont do it this way because it is slow. Stop being a lazy bumb and make a proper serializer convter thingy for JSON.Net and this time_played format
+        //public TimeSpan TimeSpan => TimeSpan.Parse(TimePlayed.Replace("h", "").Replace("m", "").Replace(" ", ":"));
     }
 }
