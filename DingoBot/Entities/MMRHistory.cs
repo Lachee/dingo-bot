@@ -56,6 +56,7 @@ namespace DingoBot.Entities
         /// <returns></returns>
         public int GetCacheCode()
         {
+            if ((Minimum | Maximum | Average) == 0) return 0;
             return (int)(15961635 ^ Season)
                 ^ (int)Math.Floor(Current - ((decimal)Current % CACHE_ROUNDING)) << 7
                 ^ (int)Math.Floor(Minimum - ((decimal)Current % Minimum)) << 5

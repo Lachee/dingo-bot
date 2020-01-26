@@ -12,6 +12,7 @@ namespace DingoBot.Entities
     {
         private const bool DEBUG_COOKIES = false;
         private const bool NO_CACHE_RENDER = false;
+        private const int RENDER_CACHE_REVISION = 2;
 
         public delegate void MMRHistoryEvent(SiegeProfile profile, MMRHistory previous, MMRHistory current);
 
@@ -41,7 +42,7 @@ namespace DingoBot.Entities
         /// <summary>
         /// How long before the previously cached profile data expires
         /// </summary>
-        public TimeSpan ProfileDataTLL { get; set; } = TimeSpan.FromMinutes(2);
+        public TimeSpan ProfileDataTLL { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// How long before the previously cached operators expire
@@ -51,7 +52,7 @@ namespace DingoBot.Entities
         /// <summary>
         /// How long before the previously rendered profile expires
         /// </summary>
-        public TimeSpan ProfileRenderTLL{ get; set; } = TimeSpan.FromMinutes(30);
+        public TimeSpan ProfileRenderTLL{ get; set; } = TimeSpan.FromHours(2);
 
         /// <summary>
         /// The profile data
@@ -62,6 +63,11 @@ namespace DingoBot.Entities
         /// The MMR history
         /// </summary>
         public MMRHistory MMRHistory { get; private set; }
+
+        /// <summary>
+        /// Is the profile ranked?
+        /// </summary>
+        public bool IsRanked => Profile != null && Profile.Rank > Rank.Unranked;
 
         public IReadOnlyDictionary<string, Operator> Operators { get; private set; }
 
@@ -236,7 +242,7 @@ namespace DingoBot.Entities
                 throw new InvalidOperationException("Cannot render a profile if there is no MMR data");
 
             //Prepare a code which we will use for the cache
-            var cacheCode = Profile.GetCacheCode() ^ MMRHistory.GetCacheCode();
+            var cacheCode = RENDER_CACHE_REVISION ^ Profile.GetCacheCode() ^ MMRHistory.GetCacheCode();
             var cacheName = Namespace.Combine(Manager.RedisPrefix, "profiles", ApiName, "render", cacheCode);
 
             //Fetch the cache

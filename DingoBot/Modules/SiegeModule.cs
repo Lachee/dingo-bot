@@ -88,8 +88,8 @@ namespace DingoBot.Modules
             await ctx.ReplyWithFileAsync($"{profile.Name}.png", render);
         }
 
-        [Command("recache")]
-        [Description("Forces a newer version of the profile")]
+        [Command("check"), Aliases("c")]
+        [Description("Checks for a newer version of the profile, forcing a recache.")]
         public async Task RecacheAccount(CommandContext ctx, [RemainingText] string accountName)
         {
 
@@ -111,5 +111,39 @@ namespace DingoBot.Modules
             await ctx.ReplyWithFileAsync($"{profile.Name}.png", render);
         }
 
+        [Command("clear")]
+        [RequireOwner]
+        [Description("Clears previously cached images")]
+        public async Task ClearRender(CommandContext ctx, [RemainingText] string accountName) {
+
+            await ctx.ReplyWorkingAsync();
+
+            //Make sure account name is valid
+            if (string.IsNullOrEmpty(accountName))
+            {
+                await ctx.ReplyReactionAsync(false);
+                return;
+            }
+
+            //Get all the keys. Note this is custom because the Profile doesnt actually contain this information
+            var cacheKey = Namespace.Combine(Bot.SiegeManager.RedisPrefix, "profiles", accountName.ToLowerInvariant(), "render");
+            var searchKey = cacheKey + "*";
+
+            var redis = Redis as StackExchangeClient;
+            var server = redis.GetServersEnumable().First();
+            var keys = server.Keys(pattern: searchKey);
+
+            //Prepare a transaction
+            var t = Redis.CreateTransaction();
+
+            //Delete all the keys
+            foreach (var k in keys) {
+               _ = t.RemoveAsync(k);
+            }
+
+            //Execute Transactoin
+            await t.ExecuteAsync();
+            await ctx.ReplyReactionAsync(true);
+        }
     }
 }

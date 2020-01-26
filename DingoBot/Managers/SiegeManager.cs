@@ -23,7 +23,7 @@ namespace DingoBot.Managers
         /// <summary>
         /// Current MMR Season
         /// </summary>
-        public uint Season { get; set; } = 1;
+        public uint Season { get; set; } = 7;
 
         public SiegeManager(Dingo bot, Logger logger = null) : base(bot, logger)
         {
