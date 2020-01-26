@@ -10,8 +10,8 @@ namespace DingoBot.Entities
 {
     public class SiegeProfile : Base64Serializable
     {
-        private const bool DEBUG_COOKIES = true;
-        private const bool NO_CACHE_RENDER = true;
+        private const bool DEBUG_COOKIES = false;
+        private const bool NO_CACHE_RENDER = false;
 
         public delegate void MMRHistoryEvent(SiegeProfile profile, MMRHistory previous, MMRHistory current);
 

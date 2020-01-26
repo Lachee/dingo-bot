@@ -1,7 +1,6 @@
 <head>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 	<script src="./js/jquery-3.4.1.min.js"></script>
-	<script src="./js/jquery-ui.min.js"> </script>
 	<script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
     <script src="./js/jquery-ui-slider-pips.min.js"> </script>
     <script src="DEFAULT_PROFILE.js"></script>
@@ -126,6 +125,31 @@
         .top-operators .slider {
             margin-left: 22px;
         }
+
+        .top-stats {
+            width: 335px;
+            float: right;
+        }
+
+        .top-stats .stat {
+            float: left;
+            width: 150px;
+            margin-top: 35px;
+        }
+
+        .top-stats .stat span {
+            display: block;
+            text-align: center;
+        }
+
+        .top-stats .stat span#value {
+            font-size: 22pt;
+            font-weight: bold;
+        }
+
+        .top-stats .stat span#label {
+            font-size: 10pt;
+        }
     </style>
 </head>
 <body>
@@ -137,8 +161,8 @@
             <img class="rank"  data-src="r6.Profile.RankSVG" src="https://chickatrice.net/chickatrice.png"/>
         </div>
         <div class="title">
-            <div class="name" data-src="r6.Name">KommadantKlink</div>
-            <div class="desc" data-src="r6.ProfileDataTTL">Montagne Main</div>
+            <div class="name" data-text="r6.Name">KommadantKlink</div>
+            <div class="desc" data-text="r6.ProfileDataTTL">Montagne Main</div>
             <div id="flat-slider"></div>
         </div>
     </div>
@@ -151,6 +175,28 @@
             <div id="defender">
                 <div class="slider"><div id="flat-slider-vertical-2"></div></div>
                 <img class="icon" src="https://trackercdn.com/rainbow6-ubi/assets/images/badge-tachanka.ae7943f00d.png"/>
+            </div>
+        </div>
+        <div class="top-stats">
+            <div class="top">
+                <div class="stat">
+                    <span id="value" data-text="r6.Profile.meta.level">000</span>
+                    <span id="label">Level</span>
+                </div>
+                <div class="stat">
+                    <span id="value" data-text="r6.Profile.general.time_played">000</span>
+                    <span id="label">Played</span>
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="stat">
+                    <span id="value" data-text="r6.Formatted.WinPercent">000</span>
+                    <span id="label">Win %</span>
+                </div>
+                <div class="stat">
+                    <span id="value" data-text="r6.Formatted.KD">000</span>
+                    <span id="label">KD</span>
+                </div>
             </div>
         </div>
     </div>
@@ -167,6 +213,12 @@
 	//The profile from d.lu.je/siege/profile.php
 	var profile = getProfile();
 	console.log("r6. ", profile);
+
+    //Format the KD
+    profile.Formatted = {
+        WinPercent: (profile.Profile.general.WinPercent * 100).toFixed(1) + "%",
+        KD: (profile.Profile.general.KD).toFixed(2),
+    }
     
 	//Set all the things
     setMMRSlider();
@@ -233,8 +285,9 @@
 				//If we are a correct type, set the values.
 				// Otherwise go a level deeper.
 				if (t == 'number' || t == 'string' || t == 'boolean') {
-					$('[data-src="' + prefix + key + '"]').text(o);
+					$('[data-text="' + prefix + key + '"]').text(o);
 					$('img[data-src="' + prefix + key + '"]').attr('src', o);
+
                     //console.log(prefix + key , "=", o);
 				} else {
 					setattr(prefix + key + ".", o);
