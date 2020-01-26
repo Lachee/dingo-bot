@@ -127,8 +127,9 @@
         }
 
         .top-stats {
-            width: 335px;
-            float: right;
+            position: absolute;
+            top: 180px;
+            left: 190px;
         }
 
         .top-stats .stat {
@@ -149,6 +150,15 @@
 
         .top-stats .stat span#label {
             font-size: 10pt;
+        }
+
+        .unranked .top-stats {
+            top: 130px;
+            left: 190px;
+        }
+
+        .unranked .rank, .unranked .title #flat-slider {
+            display: none;
         }
     </style>
 </head>
@@ -220,6 +230,11 @@
         KD: (profile.Profile.general.KD).toFixed(2),
     }
     
+    //Set the unranked
+    if (!profile.IsRanked) {
+        $('.profile').addClass("unranked");
+    }
+
 	//Set all the things
     setMMRSlider();
     setAttributes();
