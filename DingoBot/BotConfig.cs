@@ -15,6 +15,10 @@ namespace DingoBot
         public string Token { get { return File.ReadAllText(TokenFile); } }
         public string TokenFile { get; set; } = "discord.key";
 
+        [JsonIgnore]
+        public string R6StatsToken { get { return File.ReadAllText(R6StatsTokenFile);  } }
+        public string R6StatsTokenFile { get; set; } = "r6stats.key";
+
 
         public string Resources { get; set; } = "Resources/";
 

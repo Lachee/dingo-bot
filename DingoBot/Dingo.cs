@@ -32,6 +32,7 @@ namespace DingoBot
         public ReplyManager ReplyManager { get; }
         public SiegeManager SiegeManager { get; }
         public LastManager LastManager { get; }
+        public R6Stats.R6StatsClient R6StatsClient { get; }
 
         public Dingo(BotConfig config)
         {
